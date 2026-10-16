@@ -22,6 +22,57 @@ jobs:
       - name: 백엔드 테스트
         run: ./gradlew test
 
+  # 실제 PostgreSQL에서 마이그레이션이 돌고 서버가 뜨는지 확인한다(테스트는 H2만 쓰므로 따로 본다)
+  postgres:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: noticeboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d noticeboard"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v5
+      - name: 실행 파일 만들기
+        run: ./gradlew bootJar
+      - name: PostgreSQL로 서버 기동 확인
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/noticeboard
+          SPRING_DATASOURCE_USERNAME: ci
+          SPRING_DATASOURCE_PASSWORD: ci-only-password
+        run: |
+          java -jar build/libs/*[!n].jar > server.log 2>&1 &
+          SERVER_PID=$!
+          for i in $(seq 1 60); do
+            if curl -fs http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+              echo "서버가 PostgreSQL로 정상 기동했다"
+              kill $SERVER_PID
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "서버가 제한 시간 안에 뜨지 않았다"
+          cat server.log
+          kill $SERVER_PID || true
+          exit 1
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
