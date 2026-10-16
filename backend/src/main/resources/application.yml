@@ -28,3 +28,7 @@ app:
   admin:
     username: ${ADMIN_USERNAME}
     password-hash: ${ADMIN_PASSWORD_HASH}
+  # Pages Functions만 아는 비밀값(ADR-0003). 운영에서는 반드시 켜 두고, 값은 환경변수 PROXY_SECRET으로만 넣는다
+  proxy:
+    check-enabled: true
+    secret: ${PROXY_SECRET:}

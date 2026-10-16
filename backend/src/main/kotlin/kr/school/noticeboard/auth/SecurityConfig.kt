@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.security.web.csrf.CsrfException
+import org.springframework.security.web.csrf.CsrfFilter
 import tools.jackson.databind.json.JsonMapper
 
 /**
@@ -34,8 +35,18 @@ import tools.jackson.databind.json.JsonMapper
 class SecurityConfig {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, jsonMapper: JsonMapper): SecurityFilterChain {
+    fun securityFilterChain(
+        http: HttpSecurity,
+        jsonMapper: JsonMapper,
+        @Value("\${app.proxy.check-enabled}") proxyCheckEnabled: Boolean,
+        @Value("\${app.proxy.secret}") proxySecret: String,
+    ): SecurityFilterChain {
+        // 비밀 헤더 검사는 CSRF·로그인 검사보다 먼저 한다(직접 들어온 요청은 다른 검사까지 가지 않는다)
+        val proxySecretFilter = ProxySecretFilter(proxyCheckEnabled, proxySecret) { response ->
+            writeError(response, jsonMapper, HttpStatus.FORBIDDEN, "PROXY_SECRET_INVALID", "허용되지 않은 접근입니다")
+        }
         http
+            .addFilterBefore(proxySecretFilter, CsrfFilter::class.java)
             .authorizeHttpRequests {
                 it.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 // 공개하는 읽기 주소는 하나씩 적는다. 새 관리자 전용 조회 API가 생겨도 실수로 공개되지 않게 한다

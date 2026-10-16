@@ -14,6 +14,9 @@ class ApiClient(private val port: Int) {
     private val http = HttpClient.newHttpClient()
     val cookies = mutableMapOf<String, String>()
 
+    /** 모든 요청에 붙일 헤더(Pages Functions가 붙이는 비밀값·방문자 IP를 흉내 낼 때 쓴다) */
+    val headers = mutableMapOf<String, String>()
+
     /** 마지막으로 받은 Set-Cookie 줄 전체(속성 확인용) */
     var lastSetCookies: List<String> = emptyList()
         private set
@@ -26,6 +29,7 @@ class ApiClient(private val port: Int) {
         val builder = HttpRequest.newBuilder(URI.create("http://localhost:$port$path"))
             .method(method, json?.let { HttpRequest.BodyPublishers.ofString(it) } ?: HttpRequest.BodyPublishers.noBody())
             .header("Content-Type", "application/json")
+        headers.forEach { (name, value) -> builder.header(name, value) }
         if (cookies.isNotEmpty()) builder.header("Cookie", cookies.entries.joinToString("; ") { "${it.key}=${it.value}" })
         if (withCsrf) cookies["XSRF-TOKEN"]?.let { builder.header("X-XSRF-TOKEN", it) }
 

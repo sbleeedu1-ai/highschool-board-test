@@ -7,6 +7,9 @@ spring:
 
 # 테스트 전용 가짜 관리자 계정(비밀번호: test-password-1234). 운영 값과 관계없다
 app:
+  # 비밀 헤더 검사는 기본으로 끄고, 그 검사를 다루는 테스트에서만 켠다
+  proxy:
+    check-enabled: false
   admin:
     username: test-admin
     password-hash: "{bcrypt}$2a$10$fMsc9RyhK098zvD699quo.P94EncDH.jRVUXJsUd1bkoBcMljEtWq"

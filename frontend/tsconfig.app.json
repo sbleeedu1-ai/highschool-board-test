@@ -25,5 +25,5 @@
     /* 경로 별칭(shadcn/ui) */
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src"]
+  "include": ["src", "functions"]
 }
