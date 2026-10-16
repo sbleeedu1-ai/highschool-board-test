@@ -3,14 +3,16 @@
 마지막 갱신: 2026-10-16 · Claude · 강의실 PC
 
 ## 다음 할 일
-1. PR #6(티켓 01)을 사용자가 확인하고 `main`에 병합한다. 병합 뒤 브랜치 삭제는 `docs/agents/handoff.md` 규칙대로.
-2. 병합 뒤 티켓 02(공지 목록)와 04(관리자 로그인)를 진행한다. 둘은 동시에 해도 된다.
+1. 티켓 02(이 브랜치 `feat/02-notice-list`)와 04(`feat/04-admin-login`, 02 위에 쌓음)를 사용자 확인 후 PR로 만들고, 02 → 04 순서로 병합한다.
+2. 그다음 03(공지 상세)과 08(비밀 헤더·로그인 잠금)을 병렬로 진행할 수 있다.
 
 ## 현재 상태
-- 티켓 01(걷는 뼈대) 구현 완료, PR #6 열림(CI 통과, 병합 대기).
-  - `backend/`: Spring Boot 4.1.1 + Kotlin. `GET /api/version`, 공통 오류 형식(`code`·`message`·`fieldErrors`), 교체 가능한 시계(`ClockConfig`), `local`·`test`·`prod` 프로필
-  - `frontend/`: Vite 8 + React 19 + TypeScript 6 + shadcn/ui(Tailwind v4). 화면 하단에 버전 표시
-  - `.github/workflows/ci.yml`
+- 티켓 01 병합 완료(PR #6).
+- 티켓 02 구현 완료(이 브랜치). Sonnet이 작성하고 Opus가 검토했다.
+  - 백엔드: 공지 표(`V1__create_notice.sql`), `GET /api/notices?page=N`(응답 `items`·`page`·`totalPages`·`totalElements`)
+  - 프론트: `react-router` v7, 공통 틀 `Layout`, 공지 목록 화면, `src/lib/page.ts`·`date.ts`
+  - CI: `postgres` 작업(실제 PostgreSQL 17로 마이그레이션·서버 기동 확인). GitHub에서는 아직 안 돌았다
+- 티켓 04는 다른 폴더(`highschool_board_test`, 브랜치 `feat/04-admin-login`)에서 진행 중이다.
 - 실행·테스트 명령은 `AGENTS.md`의 "프로젝트" 칸에 있다.
 
 ## 막힌 점 / 확인이 필요한 결정
@@ -27,13 +29,15 @@
 - Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다.
 
 ## 마지막 검증
-- 백엔드 `./gradlew clean test`: 테스트 4개 통과(버전 local, 버전 커밋 번호, 404 형식, 405 형식)
+- 티켓 02: 백엔드 테스트 11개 통과(목록 7개 추가), 프론트 Vitest 10개·lint·타입 검사·빌드 통과
+- 티켓 02 화면: 가짜 공지 25건을 메모리 DB에 넣고 브라우저로 확인. 표준 폭에서 10건·페이지 번호 1·2·3, 390px 폭에서 제목 아래 날짜, 가로 스크롤 없음
+- 티켓 01: 백엔드 `./gradlew clean test`: 테스트 4개 통과(버전 local, 버전 커밋 번호, 404 형식, 405 형식)
 - 프론트: `npm run lint`(shadcn이 만든 `button.tsx` 경고 1개, 오류 없음), `npm run typecheck`, `npm test`(3개 통과), `npm run build` 모두 통과
 - 직접 실행: `bootRun` 후 `curl localhost:8080/api/version` → `{"version":"local"}`, 없는 주소 → 404 공통 형식, `/actuator/health` → UP. Vite 개발 서버(5173)의 `/api/version`도 같은 응답(프록시 확인). 브라우저에서 화면 맨 아래에 "버전 local" 표시 확인
-- PR #6에서 GitHub CI 첫 실행 통과(backend 1분 11초, frontend 21초)
+- 티켓 01: PR #6에서 GitHub CI 첫 실행 통과(backend 1분 11초, frontend 21초)
 
 ## 추천 스킬
-- `/tdd`: 티켓 02·04도 HTTP API 접점에서 실패하는 테스트부터 쓴다.
+- `/tdd`: 티켓마다 HTTP API 접점에서 실패하는 테스트부터 쓴다.
 - `/code-review`: PR 전에 명세·티켓 기준으로 검토한다.
 
 ## 참고 문서
