@@ -7,11 +7,14 @@ export const LOGIN_API = '/api/auth/login'
 export class ApiError extends Error {
   readonly status: number
   readonly code: string | null
+  /** 입력 오류(400)일 때 칸별 안내 */
+  readonly fieldErrors: { field: string; message: string }[]
 
-  constructor(status: number, code: string | null, message: string) {
+  constructor(status: number, code: string | null, message: string, fieldErrors: { field: string; message: string }[] = []) {
     super(message)
     this.status = status
     this.code = code
+    this.fieldErrors = fieldErrors
   }
 }
 
@@ -38,7 +41,7 @@ export async function sendJson<T>(method: 'POST' | 'PUT' | 'DELETE', path: strin
   }
   if (!res.ok) {
     const error = await res.json().catch(() => null)
-    throw new ApiError(res.status, error?.code ?? null, error?.message ?? '잠시 후 다시 시도해 주세요')
+    throw new ApiError(res.status, error?.code ?? null, error?.message ?? '잠시 후 다시 시도해 주세요', error?.fieldErrors ?? [])
   }
   return res.status === 204 ? null : res.json()
 }

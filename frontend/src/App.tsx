@@ -3,6 +3,7 @@ import Layout from '@/components/Layout'
 import RequireAdmin from '@/components/RequireAdmin'
 import { AuthProvider } from '@/lib/auth'
 import LoginPage from '@/pages/LoginPage'
+import NoticeCreatePage from '@/pages/NoticeCreatePage'
 import NoticeDetailPage from '@/pages/NoticeDetailPage'
 import NoticeListPage from '@/pages/NoticeListPage'
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/admin/login" element={<LoginPage />} />
           {/* 관리자 화면: 로그인하지 않았으면 로그인 화면으로 보낸다. 등록(05)·수정(06) 화면을 이 안에 덧붙인다 */}
           <Route path="/admin/notices" element={<RequireAdmin />}>
+            <Route path="new" element={<NoticeCreatePage />} />
             <Route path="*" element={<p className="py-12 text-center text-muted-foreground">준비 중인 화면입니다</p>} />
           </Route>
         </Route>

@@ -37,6 +37,11 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
     fun noticeNotFound(e: NoticeNotFoundException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse("NOTICE_NOT_FOUND", "공지를 찾을 수 없습니다"))
 
+    /** 입력 오류. 어느 칸이 왜 틀렸는지 함께 돌려준다 */
+    @ExceptionHandler(InvalidInputException::class)
+    fun invalidInput(e: InvalidInputException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.badRequest().body(ErrorResponse("INVALID_INPUT", "입력 내용을 확인해 주세요", e.fieldErrors))
+
     /** 예상하지 못한 오류. 원인은 로그에만 남기고 방문자에게는 다시 시도하라고만 알린다. */
     @ExceptionHandler(Exception::class)
     fun unexpected(e: Exception): ResponseEntity<ErrorResponse> {

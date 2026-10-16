@@ -9,3 +9,6 @@ data class ErrorResponse(
 
 /** 어느 칸(field)이 왜(message) 잘못되었는지 */
 data class FieldError(val field: String, val message: String)
+
+/** 입력 오류. 공통 오류 형식의 400과 칸별 안내(fieldErrors)로 바뀐다 */
+class InvalidInputException(val fieldErrors: List<FieldError>) : RuntimeException("입력 내용을 확인해 주세요")
