@@ -3,7 +3,11 @@
 ## 프로젝트
 
 - 무엇: 고등학교 공지 게시판(방문자 열람, 관리자 1명이 등록·수정·삭제)
-- 실행·테스트 명령: 티켓 01에서 채운다
+- 구조: `backend/`(Spring Boot API), `frontend/`(Vite + React 화면). 루트 빌드 도구는 없다.
+- 준비물: Java 21(JDK), Node 24
+- 백엔드(`backend/`에서): 실행 `./gradlew bootRun`(8080, `local` 프로필), 테스트 `./gradlew test`
+- 프론트(`frontend/`에서): 처음 한 번 `npm install`, 실행 `npm run dev`(5173, `/api`는 8080으로 프록시), 테스트 `npm test`, 검사 `npm run lint`·`npm run typecheck`, 빌드 `npm run build`
+- CI: `.github/workflows/ci.yml`(PR과 `main` push)
 - 테스트는 외부 계정·비밀값 없이 돌게 만들고 늘 통과 상태로 둔다
 - 공개 저장소다. 비밀값, 실제 학생·교직원 개인정보, 남의 저작물(학교 로고 등)은 커밋하지 않는다. 예시·테스트용 공지는 가짜 내용으로 쓴다.
 

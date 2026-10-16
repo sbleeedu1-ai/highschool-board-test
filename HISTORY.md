@@ -44,3 +44,10 @@
 - 사용자 선택: "네 이름은 new-setup 으로 합시다", 새 프로젝트 점검표에서 grill 흐름은 "가끔 wayfinder 부터 할거같아서 빼죠", README는 "간략한 소개 - 설치 - 어디에 들어가나 - 참고 이렇게 4개만 남기고 나머지는 다른 문서를 하나 생성해서 옮기죠"
 - 결과: 비공개 저장소 `sbleeedu1-ai/new-setup`(`install.cmd`, `GUIDE.md`), 강의실 PC에서 설치 스크립트 실행 통과, Codex 개인설정 제목 통일
 - 추가 선택: "폴더이름도 새프로젝트_설정 -> new-setup 으로 맞추고", "mac 을 사용할 경우를 대비해 windows / mac 설치 경로가 다를수 있잖아요?" → 경로는 홈 폴더 기준으로 같고 스크립트 언어만 다름을 확인, mac용 `install.sh` 추가(실제 mac에서는 미검증)
+
+### [7] 2026-10-16 · 티켓 01 걷는 뼈대 구현
+
+- 제안: 이 PC에 Java가 없음을 Claude가 발견하고 설치 방법을 물음. Spring Security는 모든 주소를 막아 버리므로 티켓 04에서 넣고, 01에는 JPA·Flyway·H2·PostgreSQL까지만 넣자고 함
+- 사용자 선택: JDK 설치 방법으로 "winget으로 설치 (Recommended)"
+- 검수(code-review)에서 고친 것: 모든 오류를 500으로 바꾸던 처리기를 Spring 기본 상태 코드(404·405 등)를 지키도록 수정(405 테스트 추가), 루트에서 실행해도 H2 데이터가 제외되게 함, Vite 로고 아이콘 제거
+- 결과: 브랜치 `feat/01-walking-skeleton` — `backend/`, `frontend/`, CI 워크플로, `AGENTS.md` 실행 명령
