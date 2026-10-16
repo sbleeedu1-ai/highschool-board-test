@@ -6,20 +6,20 @@
 1. 티켓 01(걷는 뼈대)부터 구현한다: `.scratch/notice-board/issues/01-walking-skeleton.md`. 01이 끝나면 02와 04는 동시에 진행할 수 있다.
 
 ## 현재 상태
-- 명세·티켓 10개는 `main`에 있다. 코드는 아직 없다.
-- 작업 브랜치 `docs/project-rules`: AGENTS.md 프로젝트 칸·공개 규칙, `.claude/settings.json`(강제 확인), `HISTORY.md`, 인계 규칙 정리. PR은 사용자 확인 후.
+- 명세·티켓 10개, 프로젝트 규칙·`HISTORY.md`·강제 확인 설정은 모두 `main`에 있다. 코드는 아직 없다.
+- 개인 설정(개인설정·handoff 스킬·설치 스크립트)은 비공개 저장소 `sbleeedu1-ai/new-setup`으로 관리한다.
 
 ## 막힌 점 / 확인이 필요한 결정
 - 없음.
 
 ## 모르면 실수할 것
 - GitHub `main`은 브랜치 보호가 켜져 있어 직접 push가 거절된다. 항상 브랜치 → PR.
-- **집 PC는 아직 옛 설정이다.** `C:\sample\새프로젝트_설정\`의 최신 파일로 네 곳을 다시 복사해야 한다: `개인설정.md` → `~/.claude/CLAUDE.md`와 `~/.codex/AGENTS.md`, `skills/handoff/` → `~/.claude/skills/handoff/`와 `~/.codex/skills/handoff/`. (그 폴더는 git이 아니므로 집 PC로 옮기는 방법도 필요)
-- Matt Pocock 스킬을 다시 설치하면 Claude 쪽 handoff 스킬이 덮어써진다. 설치 뒤 설명이 한국어인지 확인.
+- **집 PC는 아직 옛 설정이다.** claude·codex를 켜기 전에 터미널에서 `git clone https://github.com/sbleeedu1-ai/new-setup`(비공개, 처음 한 번) → 그 폴더에서 `install.cmd` 실행. 설치 절차는 그 저장소의 README.
+- Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다(그냥 업데이트하면 handoff 스킬이 Matt 버전으로 덮어써짐).
 
 ## 마지막 검증
 - `.claude/settings.json` JSON 문법 확인, GitHub 보호 설정 조회(PR 필수·관리자 포함·강제 push 금지)
-- 합친 handoff 스킬이 Claude·Codex 두 곳에서 같은 파일인지 `cmp`로 확인
+- 강의실 PC에서 `new-setup`의 `install.cmd`를 실제로 실행해 통과(Matt 스킬 재설치 → Matt handoff 제거 → 내 handoff를 `~/.claude/skills`·`~/.agents/skills`에 복사 → 검사), 두 번째 실행도 통과
 - 코드·테스트는 아직 없음
 
 ## 추천 스킬
