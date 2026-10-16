@@ -1,9 +1,11 @@
 package kr.school.noticeboard
 
 import kr.school.noticeboard.notice.NoticeRepository
+import kr.school.noticeboard.support.MutableClock
 import kr.school.noticeboard.support.MutableClockConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
+import java.time.Duration
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,7 +30,13 @@ class NoticeCreateApiTest(
     @Autowired val mockMvc: MockMvc,
     @Autowired val repository: NoticeRepository,
     @Autowired val jsonMapper: JsonMapper,
+    @Autowired val clock: MutableClock,
 ) {
+
+    @BeforeEach
+    fun 시계를_처음으로() {
+        clock.reset()
+    }
 
     @AfterEach
     fun 공지를_비운다() {
@@ -100,6 +109,24 @@ class NoticeCreateApiTest(
             jsonPath("$.fieldErrors[1].message") { value("본문을 입력해 주세요") }
         }
         assertThat(repository.count()).isZero()
+    }
+
+    @Test
+    fun `작성일시는 저장해도 값이 바뀌지 않게 마이크로초까지만 남긴다`() {
+        clock.advance(Duration.ofNanos(123_456_789))
+
+        create("제목", "본문").andExpect {
+            status { isCreated() }
+            jsonPath("$.createdAt") { value("2026-10-16T00:00:00.123456Z") }
+        }
+    }
+
+    @Test
+    fun `화면과 같은 기준으로 공백을 지운다(BOM만 있는 제목은 빈 제목)`() {
+        create("\uFEFF", "본문").andExpect {
+            status { isBadRequest() }
+            jsonPath("$.fieldErrors[0].message") { value("제목을 입력해 주세요") }
+        }
     }
 
     @Test

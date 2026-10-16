@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +24,8 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
   const [serverErrors, setServerErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // 버튼이 막히기 전에 빠르게 두 번 눌러도 한 번만 보내도록, 화면을 다시 그리기 전에 바로 바뀌는 값으로 막는다
+  const sending = useRef(false)
 
   const clientErrors = validateNotice(values.title, values.body)
   const errorOf = (field: 'title' | 'body') => serverErrors[field] ?? (touched[field] ? clientErrors[field] : undefined)
@@ -32,14 +34,16 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
     setValues((v) => ({ ...v, [field]: value }))
     setTouched((t) => ({ ...t, [field]: true }))
     setServerErrors((e) => ({ ...e, [field]: undefined }))
+    setFormError(null)
   }
 
   async function submit(e: FormEvent) {
     e.preventDefault()
     setTouched({ title: true, body: true })
     setFormError(null)
-    if (Object.keys(clientErrors).length > 0) return
+    if (Object.keys(clientErrors).length > 0 || sending.current) return
 
+    sending.current = true
     setSubmitting(true)
     try {
       await onSubmit(values)
@@ -52,6 +56,7 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
         setFormError('잠시 후 다시 시도해 주세요')
       }
     } finally {
+      sending.current = false
       setSubmitting(false)
     }
   }
@@ -65,6 +70,7 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
           value={values.title}
           onChange={(e) => change('title', e.target.value)}
           aria-invalid={errorOf('title') ? true : undefined}
+          aria-describedby="title-count title-error"
         />
       </Field>
       <Field id="body" label="본문" count={countLabel(values.body, BODY_MAX)} error={errorOf('body')}>
@@ -74,6 +80,7 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
           value={values.body}
           onChange={(e) => change('body', e.target.value)}
           aria-invalid={errorOf('body') ? true : undefined}
+          aria-describedby="body-count body-error"
         />
       </Field>
       {formError && (
@@ -90,15 +97,20 @@ export default function NoticeForm({ heading, submitLabel, initial, onSubmit }: 
   )
 }
 
-function Field(props: { id: string; label: string; count: string; error?: string; children: React.ReactNode }) {
+/** 칸 하나. 글자 수와 안내는 입력 칸에 연결해(aria-describedby) 화면 낭독기도 읽게 한다 */
+function Field(props: { id: string; label: string; count: string; error?: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between">
         <Label htmlFor={props.id}>{props.label}</Label>
-        <span className="text-xs text-muted-foreground">{props.count}</span>
+        <span id={`${props.id}-count`} className="text-xs text-muted-foreground">
+          {props.count}
+        </span>
       </div>
       {props.children}
-      {props.error && <p className="text-sm text-destructive">{props.error}</p>}
+      <p id={`${props.id}-error`} aria-live="polite" className="text-sm text-destructive empty:hidden">
+        {props.error}
+      </p>
     </div>
   )
 }

@@ -13,7 +13,7 @@ export function validateNotice(title: string, body: string): FieldErrors {
   if (t.length === 0) errors.title = '제목을 입력해 주세요'
   else if (t.length > TITLE_MAX) errors.title = `제목은 ${TITLE_MAX}자까지 쓸 수 있습니다`
   if (b.length === 0) errors.body = '본문을 입력해 주세요'
-  else if (b.length > BODY_MAX) errors.body = '본문은 5,000자까지 쓸 수 있습니다'
+  else if (b.length > BODY_MAX) errors.body = `본문은 ${BODY_MAX.toLocaleString('en-US')}자까지 쓸 수 있습니다`
   return errors
 }
 
