@@ -3,32 +3,41 @@
 마지막 갱신: 2026-10-16 · Claude · 강의실 PC
 
 ## 다음 할 일
-1. 티켓 01(걷는 뼈대)부터 구현한다: `.scratch/notice-board/issues/01-walking-skeleton.md`. 01이 끝나면 02와 04는 동시에 진행할 수 있다.
+1. PR #6(티켓 01)을 사용자가 확인하고 `main`에 병합한다. 병합 뒤 브랜치 삭제는 `docs/agents/handoff.md` 규칙대로.
+2. 병합 뒤 티켓 02(공지 목록)와 04(관리자 로그인)를 진행한다. 둘은 동시에 해도 된다.
 
 ## 현재 상태
-- 명세·티켓 10개, 프로젝트 규칙·`HISTORY.md`·강제 확인 설정은 모두 `main`에 있다. 코드는 아직 없다.
-- 개인 설정(개인설정·handoff 스킬·설치 스크립트)은 비공개 저장소 `sbleeedu1-ai/new-setup`으로 관리한다.
+- 티켓 01(걷는 뼈대) 구현 완료, PR #6 열림(CI 통과, 병합 대기).
+  - `backend/`: Spring Boot 4.1.1 + Kotlin. `GET /api/version`, 공통 오류 형식(`code`·`message`·`fieldErrors`), 교체 가능한 시계(`ClockConfig`), `local`·`test`·`prod` 프로필
+  - `frontend/`: Vite 8 + React 19 + TypeScript 6 + shadcn/ui(Tailwind v4). 화면 하단에 버전 표시
+  - `.github/workflows/ci.yml`
+- 실행·테스트 명령은 `AGENTS.md`의 "프로젝트" 칸에 있다.
 
 ## 막힌 점 / 확인이 필요한 결정
 - 없음.
 
 ## 모르면 실수할 것
+- **Java 21(JDK)이 필요하다.** 강의실 PC에는 2026-10-16에 `winget install EclipseAdoptium.Temurin.21.JDK`로 설치했다. 집 PC에도 같은 명령으로 설치한다. 설치 직후 이미 열려 있던 터미널은 PATH를 모르므로 새로 연다.
+- **prod 프로필이 조용히 H2로 뜰 수 있다**(티켓 09에서 막을 것): H2가 런타임 의존성이라 `application-prod.yml`에 DB 설정이 없으면 메모리 H2가 붙는다. 09에서 PostgreSQL 설정을 채울 때 H2로 뜨지 않는지 확인한다.
+- 시계를 테스트에서 고정할 때는 `@TestBean`(또는 `@MockitoBean`)으로 `Clock` 빈을 바꿔 끼운다. 같은 이름의 빈을 새로 정의해 덮어쓰는 방식은 Spring Boot가 기본으로 막는다. 처음 쓰는 곳은 티켓 05.
+- 오류 처리기는 `ResponseEntityExceptionHandler`를 상속한다. Spring이 아는 오류(404·405 등)는 상태 코드를 지키고 형식만 바꾼다. 새 상황별 오류(400·401·429 등)는 이 클래스에 덧붙인다.
+- `tsconfig`에 `baseUrl`을 넣지 않는다. TypeScript 6에서 사용 중단 오류가 난다(`paths`만으로 `@/*` 별칭이 동작한다).
 - GitHub `main`은 브랜치 보호가 켜져 있어 직접 push가 거절된다. 항상 브랜치 → PR.
-- **집 PC는 아직 옛 설정이다.** claude·codex를 켜기 전에 터미널에서 `git clone https://github.com/sbleeedu1-ai/new-setup`(비공개, 처음 한 번) → 그 폴더에서 `install.cmd` 실행(mac이면 `./install.sh`). 설치 절차는 그 저장소의 README.
-- Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다(그냥 업데이트하면 handoff 스킬이 Matt 버전으로 덮어써짐).
+- **집 PC는 아직 옛 설정이다.** claude·codex를 켜기 전에 `new-setup` 저장소를 받아 `install.cmd`(mac이면 `./install.sh`)를 실행한다. 절차는 그 저장소의 README.
+- Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다.
 
 ## 마지막 검증
-- `.claude/settings.json` JSON 문법 확인, GitHub 보호 설정 조회(PR 필수·관리자 포함·강제 push 금지)
-- 강의실 PC에서 `new-setup`의 `install.cmd`를 실제로 실행해 통과(Matt 스킬 재설치 → Matt handoff 제거 → 내 handoff를 `~/.claude/skills`·`~/.agents/skills`에 복사 → 검사), 두 번째 실행도 통과
-- 코드·테스트는 아직 없음
+- 백엔드 `./gradlew clean test`: 테스트 4개 통과(버전 local, 버전 커밋 번호, 404 형식, 405 형식)
+- 프론트: `npm run lint`(shadcn이 만든 `button.tsx` 경고 1개, 오류 없음), `npm run typecheck`, `npm test`(3개 통과), `npm run build` 모두 통과
+- 직접 실행: `bootRun` 후 `curl localhost:8080/api/version` → `{"version":"local"}`, 없는 주소 → 404 공통 형식, `/actuator/health` → UP. Vite 개발 서버(5173)의 `/api/version`도 같은 응답(프록시 확인). 브라우저에서 화면 맨 아래에 "버전 local" 표시 확인
+- PR #6에서 GitHub CI 첫 실행 통과(backend 1분 11초, frontend 21초)
 
 ## 추천 스킬
-- `/tdd`: 티켓마다 HTTP API 접점에서 실패하는 테스트부터 쓰고 구현한다.
-- `/code-review`: 티켓 하나를 마치면 PR 전에 명세·티켓 기준으로 검토한다.
-- `/wizard`: 티켓 09에서 사람이 할 배포 설정 단계를 스크립트로 만든다.
+- `/tdd`: 티켓 02·04도 HTTP API 접점에서 실패하는 테스트부터 쓴다.
+- `/code-review`: PR 전에 명세·티켓 기준으로 검토한다.
 
 ## 참고 문서
-- 명세: `.scratch/notice-board/spec.md`
+- 명세: `.scratch/notice-board/spec.md`, 티켓: `.scratch/notice-board/issues/`
 - 용어집: `CONTEXT.md`
-- 결정: `docs/adr/0001-pages-functions-api-proxy.md`, `docs/adr/0002-admin-credentials-in-env.md`, `docs/adr/0003-proxy-secret-and-ip-lockout.md`
+- 결정: `docs/adr/0001-0003`
 - 인계 규칙: `docs/agents/handoff.md`

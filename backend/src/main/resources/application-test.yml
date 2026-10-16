@@ -1,0 +1,6 @@
+# 테스트: H2 메모리 DB(PostgreSQL 호환 모드). 테스트가 끝나면 사라진다
+spring:
+  datasource:
+    url: jdbc:h2:mem:noticeboard;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
