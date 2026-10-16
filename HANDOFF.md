@@ -14,7 +14,7 @@
 
 ## 모르면 실수할 것
 - GitHub `main`은 브랜치 보호가 켜져 있어 직접 push가 거절된다. 항상 브랜치 → PR.
-- **집 PC는 아직 옛 설정이다.** claude·codex를 켜기 전에 터미널에서 `git clone https://github.com/sbleeedu1-ai/new-setup`(비공개, 처음 한 번) → 그 폴더에서 `install.cmd` 실행. 설치 절차는 그 저장소의 README.
+- **집 PC는 아직 옛 설정이다.** claude·codex를 켜기 전에 터미널에서 `git clone https://github.com/sbleeedu1-ai/new-setup`(비공개, 처음 한 번) → 그 폴더에서 `install.cmd` 실행(mac이면 `./install.sh`). 설치 절차는 그 저장소의 README.
 - Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다(그냥 업데이트하면 handoff 스킬이 Matt 버전으로 덮어써짐).
 
 ## 마지막 검증

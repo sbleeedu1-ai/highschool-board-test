@@ -43,3 +43,4 @@
 - 제안: Claude가 `새프로젝트_설정`을 비공개 저장소로 만들고 설치 순서(Matt 스킬 → Matt handoff 제거 → 내 handoff → 개인설정 → 검사)를 스크립트로 고정하자고 제안. 진행 중 Codex 개인 스킬의 공식 위치가 `~/.agents/skills`임을 확인해 정정
 - 사용자 선택: "네 이름은 new-setup 으로 합시다", 새 프로젝트 점검표에서 grill 흐름은 "가끔 wayfinder 부터 할거같아서 빼죠", README는 "간략한 소개 - 설치 - 어디에 들어가나 - 참고 이렇게 4개만 남기고 나머지는 다른 문서를 하나 생성해서 옮기죠"
 - 결과: 비공개 저장소 `sbleeedu1-ai/new-setup`(`install.cmd`, `GUIDE.md`), 강의실 PC에서 설치 스크립트 실행 통과, Codex 개인설정 제목 통일
+- 추가 선택: "폴더이름도 새프로젝트_설정 -> new-setup 으로 맞추고", "mac 을 사용할 경우를 대비해 windows / mac 설치 경로가 다를수 있잖아요?" → 경로는 홈 폴더 기준으로 같고 스크립트 언어만 다름을 확인, mac용 `install.sh` 추가(실제 mac에서는 미검증)
