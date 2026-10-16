@@ -51,3 +51,10 @@
 - 사용자 선택: JDK 설치 방법으로 "winget으로 설치 (Recommended)"
 - 검수(code-review)에서 고친 것: 모든 오류를 500으로 바꾸던 처리기를 Spring 기본 상태 코드(404·405 등)를 지키도록 수정(405 테스트 추가), 루트에서 실행해도 H2 데이터가 제외되게 함, Vite 로고 아이콘 제거
 - 결과: PR #6(`feat/01-walking-skeleton`) — `backend/`, `frontend/`, CI 워크플로, `AGENTS.md` 실행 명령. PR 생성은 "네 진행하세요", CI 첫 실행 통과
+
+### [8] 2026-10-16 · 티켓 02 공지 목록 (병렬 진행 시작)
+
+- 제안: 02와 04는 같은 파일을 건드려 충돌 위험이 있고, 병렬은 사용량이 줄지 않는다고 Claude가 계산해 보임(티켓당 Opus 혼자 약 $2.6, Opus 감독+Sonnet 작성 약 $2.6-3.3)
+- 사용자 선택: "사람에겐 시간이란 재화도 중요하니 병렬로하세요"
+- 진행: 02는 Sonnet이 별도 작업 폴더(`highschool_board_test-02`, git worktree)에서, 04는 Opus가 원래 폴더에서. 화면 경로 설정과 CI PostgreSQL 단계는 02가, `HANDOFF`·`HISTORY`는 Opus만 쓰기로 미리 정함
+- 결과: 브랜치 `feat/02-notice-list`. Opus가 코드 검토와 화면 확인(표준 폭·390px)
