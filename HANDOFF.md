@@ -3,19 +3,15 @@
 마지막 갱신: 2026-10-16 · Claude · 강의실 PC
 
 ## 다음 할 일
-1. 사용자 확인 후 PR 두 개를 만들고 02 → 04 순서로 병합한다. 04 브랜치(`feat/04-admin-login`)는 02 브랜치(`feat/02-notice-list`) 위에 쌓여 있어, 02를 먼저 병합하면 04 PR에는 04 커밋만 남는다.
-2. 병합 뒤 03(공지 상세)과 08(비밀 헤더·로그인 잠금)을 병렬로 진행할 수 있다(사용자는 사용량이 비슷하면 병렬로 시간을 아끼는 쪽을 택함).
+1. 사용자 확인 후 03(`feat/03-notice-detail`)과 08(`feat/08-proxy-secret-and-lockout`, 03 위에 쌓음) PR을 만들고 03 → 08 순서로 병합한다.
+2. 그다음 05(공지 등록)를 진행한다. 05는 03·04에 의존하고, 06·07은 05에 의존한다. 09(배포)는 08 뒤에 사람이 할 일이 있다(`ready-for-human`).
 
 ## 현재 상태
-- 티켓 01 병합 완료(PR #6).
-- 티켓 02 구현 완료(`feat/02-notice-list`). Sonnet이 작성, Opus가 검토·화면 확인.
-  - 백엔드: 공지 표(`V1__create_notice.sql`), `GET /api/notices?page=N`(응답 `items`·`page`·`totalPages`·`totalElements`)
-  - 프론트: `react-router` v7, 공통 틀 `Layout`, 공지 목록 화면
-  - CI: `postgres` 작업(실제 PostgreSQL 17로 마이그레이션·서버 기동 확인). GitHub에서는 아직 안 돌았다
-- 티켓 04 구현 완료(`feat/04-admin-login`). 체크박스 하나(401 → 로그인 화면 안내)만 05·06에서 브라우저 확인이 남았다.
-  - 백엔드: Spring Security. `POST /api/auth/login`·`logout`, `GET /api/auth/me`, `csrf.spa()`, 메모리 세션(30분), 관리자 계정은 환경변수 `ADMIN_USERNAME`·`ADMIN_PASSWORD_HASH`
-  - 공개 읽기 주소는 허용 목록(`/api/notices`, `/api/notices/*`, `/api/version`, `/api/auth/me`). **새 공개 GET API를 만들면 `SecurityConfig`에 추가해야 한다**
-  - 프론트: `/admin/login`, 관리자 화면 문지기(`RequireAdmin`, `/admin/notices/*`), 로그아웃 버튼, `src/lib/api.ts`의 `sendJson`(CSRF 헤더·401 처리)
+- 티켓 01·02·04 병합 완료(PR #6·#7·#8).
+- 티켓 03 구현 완료(이 브랜치). Sonnet이 작성, Opus가 검토·화면 확인.
+  - 백엔드: `GET /api/notices/{id}`, 없는 공지(숫자가 아닌 id 포함)는 404 `NOTICE_NOT_FOUND`. `NoticeNotFoundException`은 06·07도 쓴다
+  - 프론트: `/notices/:id` 상세 화면, `src/lib/linkify.ts`(http(s)만 링크, HTML로 넣지 않음), 상세 날짜 형식, 목록 페이지로 돌아가기
+- 티켓 08은 다른 폴더(`highschool_board_test`, 브랜치 `feat/08-proxy-secret-and-lockout`)에서 진행했다.
 - 실행·테스트 명령, 로컬 관리자 계정 만드는 법은 `AGENTS.md`의 "프로젝트" 칸에 있다.
 
 ## 막힌 점 / 확인이 필요한 결정
@@ -38,6 +34,7 @@
 - Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다.
 
 ## 마지막 검증
+- 티켓 03: 백엔드 23개, 프론트 Vitest 32개·타입 검사·빌드 통과. 브라우저로 줄바꿈·링크 2개(`noopener`)·`<script>`는 글자로만·한국 시간 날짜(`작성 2026-10-16 14:30 · 수정 2026-10-17 09:00`)·없는 공지 화면·390px 폭 확인
 - 04 브랜치(02 포함) 백엔드 `./gradlew clean test`: 19개 통과. 인증 테스트는 실제 서버를 띄워 쿠키 속성(HttpOnly·Secure·SameSite=Lax)까지 본다. `HttpOnly`를 끄면 테스트가 실패하는 것도 확인했다
 - 프론트: Vitest 19개(쿠키 읽기, 돌아갈 주소 검사 포함), 타입 검사, 빌드 통과. lint는 경고 3개(오류 없음)
 - 브라우저(로컬): 관리자 화면 → 로그인 화면 이동, 틀린 비밀번호 문구, 로그인 후 원래 화면 복귀, 로그인 상태에서만 로그아웃 버튼, 로그아웃 후 첫 화면

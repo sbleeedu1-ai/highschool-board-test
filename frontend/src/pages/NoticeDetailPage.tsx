@@ -59,7 +59,7 @@ export default function NoticeDetailPage() {
   return (
     <article className="flex flex-col gap-6">
       <header className="flex flex-col gap-2 border-b pb-4">
-        <h1 className="break-words text-xl font-bold">{title}</h1>
+        <h2 className="break-words text-xl font-bold">{title}</h2>
         <p className="text-sm text-muted-foreground">{formatDetailDate(createdAt, updatedAt)}</p>
       </header>
       {/* 본문은 글로만 그린다(HTML로 넣지 않음). 줄바꿈은 그대로, 주소만 새 탭 링크 */}
