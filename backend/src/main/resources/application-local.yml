@@ -4,3 +4,13 @@ spring:
     url: jdbc:h2:file:./data/noticeboard;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     username: sa
     password: ""
+  # 로컬 관리자 계정은 git에 올라가지 않는 backend/.env.local 에서 읽는다(예시: .env.example)
+  config:
+    import: optional:file:.env.local[.properties]
+
+server:
+  servlet:
+    session:
+      cookie:
+        # 로컬은 HTTPS가 아니므로 Secure 쿠키를 끈다
+        secure: false
