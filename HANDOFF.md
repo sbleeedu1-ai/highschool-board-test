@@ -1,15 +1,14 @@
 # HANDOFF
 
-마지막 갱신: 2026-10-16 · Claude · 강의실 PC
+마지막 갱신: 2026-10-16 · Claude · 강의실 PC(사용량 90%로 마감)
 
 ## 다음 할 일
-1. 사용자 확인 후 05(`feat/05-notice-create`) PR을 만들고 병합한다.
-2. 그다음 06(공지 수정)과 07(공지 삭제)을 병렬로 진행할 수 있다(둘 다 05에만 의존). 06은 `NoticeForm`·`NoticeInput`·`NoticeNotFoundException`을 그대로 쓴다.
+1. 06(공지 수정)과 07(공지 삭제)을 병렬로 진행한다(둘 다 05에만 의존). 사용자는 사용량이 비슷하면 병렬로 시간을 아끼는 쪽을 택했다. 지금까지는 할 일이 분명한 쪽을 Sonnet(별도 작업 폴더, git worktree)에, 보안·까다로운 쪽을 Opus에 맡겼다. 06은 `NoticeForm`·`NoticeInput`·`NoticeNotFoundException`을 그대로 쓴다.
 3. 09(배포)는 사람이 할 일이 있는 티켓이다(`ready-for-human`, `/wizard` 추천). 10(운영 E2E)은 09 뒤.
 
 ## 현재 상태
-- 티켓 01·02·03·04·08 병합 완료(PR #6-#10).
-- 티켓 05 구현 완료(이 브랜치). Opus 단독.
+- 티켓 01·02·03·04·05·08 병합 완료(PR #6-#11). 남은 티켓: 06·07(병렬 가능), 09(배포, 사람 작업 포함), 10(운영 E2E).
+- 티켓 05(Opus 단독):
   - 백엔드: `POST /api/notices`(관리자만, 201 + Location). 입력 검사는 `notice/NoticeInput.kt`(앞뒤 공백 제거 후 제목 1-100자·본문 1-5,000자, 틀리면 400 `INVALID_INPUT` + `fieldErrors`). 작성일시는 시계 값을 마이크로초까지 자른 값
   - 프론트: 목록의 [새 공지](로그인 시에만, 빈 목록에서도), `/admin/notices/new` 등록 화면, 공용 입력 칸 `components/NoticeForm.tsx`(글자 수, 칸별 안내, 서버 안내 표시), `src/lib/noticeInput.ts`
 - 실행·테스트 명령, 로컬 관리자 계정 만드는 법은 `AGENTS.md`의 "프로젝트" 칸에 있다.
