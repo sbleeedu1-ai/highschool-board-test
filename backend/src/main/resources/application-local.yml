@@ -8,6 +8,11 @@ spring:
   config:
     import: optional:file:.env.local[.properties]
 
+# 로컬은 Pages Functions를 거치지 않으므로 비밀 헤더 검사를 끄고, 실제 접속 주소를 방문자 IP로 쓴다
+app:
+  proxy:
+    check-enabled: false
+
 server:
   servlet:
     session:

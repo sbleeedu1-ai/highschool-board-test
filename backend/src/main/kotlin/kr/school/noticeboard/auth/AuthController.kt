@@ -23,6 +23,7 @@ import java.security.Principal
 class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val securityContextRepository: SecurityContextRepository,
+    private val loginLockout: LoginLockout,
 ) {
 
     /**
@@ -41,15 +42,23 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Any> {
+        val ip = ProxySecretFilter.clientIp(request)
+        if (loginLockout.isLocked(ip)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ErrorResponse("LOGIN_LOCKED", "잠시 후 다시 시도해 주세요"))
+        }
+
         val authentication = try {
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken.unauthenticated(body.username, body.password),
             )
         } catch (e: AuthenticationException) {
+            loginLockout.recordFailure(ip)
             // 아이디와 비밀번호 중 어느 쪽이 틀렸는지 알려 주지 않는다
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse("LOGIN_FAILED", "아이디 또는 비밀번호가 올바르지 않습니다"))
         }
+        loginLockout.recordSuccess(ip)
 
         // 로그인 전 세션을 이어 쓰지 않도록 세션을 새로 만든다(세션 고정 공격 방지)
         request.getSession(false)?.invalidate()
