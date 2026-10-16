@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.time.Duration
+import java.util.concurrent.Executors
 
 /**
  * 운영처럼 비밀 헤더 검사를 켠 상태에서, Pages Functions가 붙이는 헤더를 테스트가 직접 붙여 흉내 낸다(ADR-0003).
@@ -113,6 +114,32 @@ class ProxySecretAndLockoutApiTest {
         assertThat(admin.login("test-password-1234")).isEqualTo(200)
 
         repeat(4) { assertThat(admin.login("wrong")).isEqualTo(401) }
+        assertThat(admin.login("test-password-1234")).isEqualTo(200)
+    }
+
+    @Test
+    fun `틀린 비밀번호를 한꺼번에 많이 보내도 잠금이 풀리지 않는다`() {
+        // 5의 배수가 아닌 개수로 보낸다(잠긴 뒤의 실패가 기록을 덮어쓰면 마지막에 잠금이 풀린 상태로 끝난다)
+        val attacker = visitor("203.0.113.1")
+        val pool = Executors.newFixedThreadPool(22)
+        try {
+            val results = (1..22).map { pool.submit<Int> { attacker.login("wrong") } }.map { it.get() }
+            assertThat(results).contains(401)
+        } finally {
+            pool.shutdown()
+        }
+
+        assertThat(attacker.login("test-password-1234")).isEqualTo(429)
+    }
+
+    @Test
+    fun `마지막 실패에서 10분이 지나면 실패 횟수를 처음부터 다시 센다`() {
+        val admin = visitor("203.0.113.1")
+        repeat(4) { admin.login("wrong") }
+
+        clock.advance(Duration.ofMinutes(10))
+        assertThat(admin.login("wrong")).isEqualTo(401)
+
         assertThat(admin.login("test-password-1234")).isEqualTo(200)
     }
 

@@ -44,6 +44,10 @@ class ProxySecretFilter(
         chain.doFilter(request, response)
     }
 
+    /**
+     * 정리하지 않은 원래 주소로 판단한다. `/actuator/health/../api/...` 같은 주소는 이 필터보다 앞에 있는
+     * Spring Security 방화벽(StrictHttpFirewall)이 먼저 400으로 거절하므로 여기까지 오지 않는다. 그 방화벽 설정을 느슨하게 바꾸지 않는다.
+     */
     private fun isHealthCheck(request: HttpServletRequest): Boolean {
         val path = request.requestURI.removePrefix(request.contextPath)
         return path == "/actuator/health" || path.startsWith("/actuator/health/")

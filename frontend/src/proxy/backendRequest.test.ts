@@ -31,6 +31,18 @@ describe('buildBackendRequest', () => {
     expect(req.headers.get('X-Client-IP')).toBe('203.0.113.9')
   })
 
+  it('방문자가 보낸 X-Forwarded-*·Forwarded 헤더는 빼고 보낸다', async () => {
+    const req = await buildBackendRequest(
+      visitorRequest({
+        headers: { 'X-Forwarded-For': '198.51.100.1', 'X-Forwarded-Host': 'evil.test', Forwarded: 'for=198.51.100.1' },
+      }),
+      ENV,
+    )
+    expect(req.headers.get('X-Forwarded-For')).toBeNull()
+    expect(req.headers.get('X-Forwarded-Host')).toBeNull()
+    expect(req.headers.get('Forwarded')).toBeNull()
+  })
+
   it('메서드·본문·쿠키·CSRF 헤더를 그대로 옮긴다', async () => {
     const req = await buildBackendRequest(
       visitorRequest({

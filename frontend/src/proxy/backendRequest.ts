@@ -19,6 +19,10 @@ export async function buildBackendRequest(request: Request, env: ProxyEnv): Prom
   const headers = new Headers(request.headers)
   headers.delete('Host')
   headers.delete('X-Client-IP')
+  // 방문자가 꾸며 보낼 수 있는 전달 헤더는 지운다(백엔드가 나중에 이 헤더를 믿게 설정되어도 IP·주소를 속일 수 없게)
+  for (const name of [...headers.keys()]) {
+    if (name.startsWith('x-forwarded-') || name === 'forwarded') headers.delete(name)
+  }
   const visitorIp = request.headers.get('CF-Connecting-IP')
   if (visitorIp) headers.set('X-Client-IP', visitorIp)
   headers.set('X-Proxy-Secret', env.PROXY_SECRET)

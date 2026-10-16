@@ -3,5 +3,14 @@
 // 백엔드 응답(상태 코드·쿠키 포함)은 손대지 않는다.
 import { buildBackendRequest, type ProxyEnv } from '../../src/proxy/backendRequest'
 
-export const onRequest = async (context: { request: Request; env: ProxyEnv }): Promise<Response> =>
-  fetch(await buildBackendRequest(context.request, context.env))
+export const onRequest = async (context: { request: Request; env: ProxyEnv }): Promise<Response> => {
+  try {
+    return await fetch(await buildBackendRequest(context.request, context.env))
+  } catch {
+    // 백엔드에 닿지 못하면 Cloudflare 오류 화면 대신 공통 오류 형식으로 알려 준다(화면은 "잠시 후 다시 시도해 주세요")
+    return Response.json(
+      { code: 'BACKEND_UNAVAILABLE', message: '잠시 후 다시 시도해 주세요', fieldErrors: [] },
+      { status: 502 },
+    )
+  }
+}
