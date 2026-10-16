@@ -3,11 +3,11 @@
 마지막 갱신: 2026-10-16 · Claude · 강의실 PC
 
 ## 다음 할 일
-1. 브랜치 `feat/01-walking-skeleton`으로 PR을 만들고(사용자 확인 후), GitHub에서 CI가 처음으로 도는지 본다. 초록이면 티켓 01의 마지막 체크박스(CI)를 체크한다.
+1. PR #6(티켓 01)을 사용자가 확인하고 `main`에 병합한다. 병합 뒤 브랜치 삭제는 `docs/agents/handoff.md` 규칙대로.
 2. 병합 뒤 티켓 02(공지 목록)와 04(관리자 로그인)를 진행한다. 둘은 동시에 해도 된다.
 
 ## 현재 상태
-- 티켓 01(걷는 뼈대) 구현 완료. 남은 것은 GitHub에서 CI가 실제로 도는지 확인하는 일뿐이다.
+- 티켓 01(걷는 뼈대) 구현 완료, PR #6 열림(CI 통과, 병합 대기).
   - `backend/`: Spring Boot 4.1.1 + Kotlin. `GET /api/version`, 공통 오류 형식(`code`·`message`·`fieldErrors`), 교체 가능한 시계(`ClockConfig`), `local`·`test`·`prod` 프로필
   - `frontend/`: Vite 8 + React 19 + TypeScript 6 + shadcn/ui(Tailwind v4). 화면 하단에 버전 표시
   - `.github/workflows/ci.yml`
@@ -30,7 +30,7 @@
 - 백엔드 `./gradlew clean test`: 테스트 4개 통과(버전 local, 버전 커밋 번호, 404 형식, 405 형식)
 - 프론트: `npm run lint`(shadcn이 만든 `button.tsx` 경고 1개, 오류 없음), `npm run typecheck`, `npm test`(3개 통과), `npm run build` 모두 통과
 - 직접 실행: `bootRun` 후 `curl localhost:8080/api/version` → `{"version":"local"}`, 없는 주소 → 404 공통 형식, `/actuator/health` → UP. Vite 개발 서버(5173)의 `/api/version`도 같은 응답(프록시 확인). 브라우저에서 화면 맨 아래에 "버전 local" 표시 확인
-- CI는 GitHub에서 아직 돌지 않았다.
+- PR #6에서 GitHub CI 첫 실행 통과(backend 1분 11초, frontend 21초)
 
 ## 추천 스킬
 - `/tdd`: 티켓 02·04도 HTTP API 접점에서 실패하는 테스트부터 쓴다.

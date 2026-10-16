@@ -50,4 +50,4 @@
 - 제안: 이 PC에 Java가 없음을 Claude가 발견하고 설치 방법을 물음. Spring Security는 모든 주소를 막아 버리므로 티켓 04에서 넣고, 01에는 JPA·Flyway·H2·PostgreSQL까지만 넣자고 함
 - 사용자 선택: JDK 설치 방법으로 "winget으로 설치 (Recommended)"
 - 검수(code-review)에서 고친 것: 모든 오류를 500으로 바꾸던 처리기를 Spring 기본 상태 코드(404·405 등)를 지키도록 수정(405 테스트 추가), 루트에서 실행해도 H2 데이터가 제외되게 함, Vite 로고 아이콘 제거
-- 결과: 브랜치 `feat/01-walking-skeleton` — `backend/`, `frontend/`, CI 워크플로, `AGENTS.md` 실행 명령
+- 결과: PR #6(`feat/01-walking-skeleton`) — `backend/`, `frontend/`, CI 워크플로, `AGENTS.md` 실행 명령. PR 생성은 "네 진행하세요", CI 첫 실행 통과

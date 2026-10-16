@@ -17,6 +17,6 @@
 - [x] 프론트: Vite + React + TypeScript + shadcn/ui(Tailwind v4) 프로젝트가 프론트 폴더에 있고, Node 24·npm으로 5173에서 뜬다
 - [x] 프론트: 개발 서버가 `/api/*`를 로컬 백엔드로 프록시하고, 화면 하단에 버전이 보인다
 - [x] 프론트: Vitest가 설정되어 있고 최소 1개 테스트가 돈다
-- [ ] CI: PR과 `main` push에서 백엔드 테스트, 프론트 lint·타입 검사·Vitest·빌드가 돈다
+- [x] CI: PR과 `main` push에서 백엔드 테스트, 프론트 lint·타입 검사·Vitest·빌드가 돈다
 - [x] 로컬 전용 파일(H2 데이터, `.env.local` 등)이 git에서 제외된다
 - [x] `AGENTS.md`의 "프로젝트" 칸에 백엔드·프론트 실행·테스트 명령을 채운다
