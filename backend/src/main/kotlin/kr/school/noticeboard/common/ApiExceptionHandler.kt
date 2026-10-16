@@ -1,5 +1,6 @@
 package kr.school.noticeboard.common
 
+import kr.school.noticeboard.notice.NoticeNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -30,6 +31,11 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
         val message = if (status == HttpStatus.NOT_FOUND) "요청한 주소를 찾을 수 없습니다" else "요청을 처리할 수 없습니다"
         return ResponseEntity.status(status).headers(headers).body(ErrorResponse(status.name, message))
     }
+
+    /** 없는 공지. 공지 상세·수정·삭제가 함께 쓴다. */
+    @ExceptionHandler(NoticeNotFoundException::class)
+    fun noticeNotFound(e: NoticeNotFoundException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse("NOTICE_NOT_FOUND", "공지를 찾을 수 없습니다"))
 
     /** 예상하지 못한 오류. 원인은 로그에만 남기고 방문자에게는 다시 시도하라고만 알린다. */
     @ExceptionHandler(Exception::class)

@@ -66,6 +66,7 @@ export default function NoticeListPage() {
           <li key={notice.id}>
             <Link
               to={`/notices/${notice.id}`}
+              state={{ page }}
               className="flex flex-col gap-1 px-4 py-3 hover:bg-muted sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
               <span className="break-words font-medium">{notice.title}</span>
