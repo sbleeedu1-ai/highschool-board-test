@@ -18,7 +18,10 @@ class ErrorResponseApiTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `알 수 없는 경로는 공통 오류 형식의 404를 돌려준다`() {
-        mockMvc.get("/api/no-such-path").andExpect {
+        // 공개 목록에 없는 주소는 로그인부터 요구하므로, 로그인한 관리자로 확인한다
+        mockMvc.get("/api/no-such-path") {
+            with(user("test-admin"))
+        }.andExpect {
             status { isNotFound() }
             content { contentTypeCompatibleWith("application/json") }
             jsonPath("$.code") { value("NOT_FOUND") }

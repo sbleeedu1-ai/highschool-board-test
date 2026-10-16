@@ -3,8 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ApiError, sendJson } from '@/lib/api'
+import { ApiError, LOGIN_API, sendJson } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
+import { safeReturnPath } from '@/lib/redirect'
 
 /** 관리자 로그인 화면(/admin/login). 방문자 화면에는 이 주소로 가는 링크가 없다 */
 export default function LoginPage() {
@@ -18,15 +19,14 @@ export default function LoginPage() {
 
   const expired = searchParams.get('expired') === '1'
   // 같은 사이트 안의 주소로만 돌아간다(다른 사이트로 보내는 주소는 무시)
-  const from = searchParams.get('from')
-  const returnTo = from && from.startsWith('/') && !from.startsWith('//') ? from : '/'
+  const returnTo = safeReturnPath(searchParams.get('from'), window.location.origin)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
     try {
-      await sendJson('POST', '/api/auth/login', { username, password })
+      await sendJson('POST', LOGIN_API, { username, password })
       await refresh()
       navigate(returnTo, { replace: true })
     } catch (err) {

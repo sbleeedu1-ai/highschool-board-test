@@ -1,4 +1,7 @@
 import { readCookie } from '@/lib/cookie'
+import { loginPath } from '@/lib/redirect'
+
+export const LOGIN_API = '/api/auth/login'
 
 /** 공통 오류 형식(code·message·fieldErrors)을 담은 API 오류 */
 export class ApiError extends Error {
@@ -11,9 +14,6 @@ export class ApiError extends Error {
     this.code = code
   }
 }
-
-/** 로그인이 만료되어 로그인 화면으로 보낼 때 붙이는 표시 */
-export const EXPIRED_QUERY = 'expired=1'
 
 /**
  * 변경 요청(POST·PUT·DELETE)을 보낸다. CSRF 쿠키 값을 X-XSRF-TOKEN 헤더로 붙인다.
@@ -31,9 +31,9 @@ export async function sendJson<T>(method: 'POST' | 'PUT' | 'DELETE', path: strin
     body: body === undefined ? undefined : JSON.stringify(body),
   })
 
-  if (res.status === 401 && path !== '/api/auth/login') {
-    const from = encodeURIComponent(window.location.pathname + window.location.search)
-    window.location.assign(`/admin/login?${EXPIRED_QUERY}&from=${from}`)
+  // 로그인 요청 자체의 401은 "비밀번호가 틀림"이므로 화면 이동 없이 로그인 화면이 처리한다
+  if (res.status === 401 && path !== LOGIN_API) {
+    window.location.assign(loginPath(window.location.pathname + window.location.search, { expired: true }))
     throw new ApiError(401, 'UNAUTHORIZED', '로그인이 필요합니다')
   }
   if (!res.ok) {

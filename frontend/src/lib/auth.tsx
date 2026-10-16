@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useLocation } from 'react-router'
 import { sendJson } from '@/lib/api'
 
 type Me = { authenticated: boolean; username: string | null }
@@ -33,9 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await refresh()
   }, [refresh])
 
+  // 화면을 옮길 때마다 다시 묻는다. 30분이 지나 세션이 끝났는데 로그아웃 버튼·관리자 화면이 남아 있지 않게 한다
+  const { pathname } = useLocation()
   useEffect(() => {
     refresh()
-  }, [refresh])
+  }, [refresh, pathname])
 
   return <AuthContext.Provider value={{ me, refresh, logout }}>{children}</AuthContext.Provider>
 }

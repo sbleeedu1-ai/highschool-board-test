@@ -26,7 +26,7 @@ import tools.jackson.databind.json.JsonMapper
 
 /**
  * 누가 무엇을 할 수 있는지 정한다.
- * - 읽기(GET)는 누구나, 로그인·로그아웃도 누구나 부를 수 있다.
+ * - 공지 목록·상세, 버전, 로그인 상태 확인은 누구나 읽을 수 있다. 로그인·로그아웃도 누구나 부를 수 있다.
  * - 그 밖의 변경 요청(공지 등록·수정·삭제)은 로그인한 관리자만.
  * - CSRF는 SPA 설정(csrf.spa()): 서버가 XSRF-TOKEN 쿠키를 주고, 프론트가 그 값을 X-XSRF-TOKEN 헤더로 돌려보낸다.
  */
@@ -38,7 +38,8 @@ class SecurityConfig {
         http
             .authorizeHttpRequests {
                 it.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                it.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                // 공개하는 읽기 주소는 하나씩 적는다. 새 관리자 전용 조회 API가 생겨도 실수로 공개되지 않게 한다
+                it.requestMatchers(HttpMethod.GET, "/api/notices", "/api/notices/*", "/api/version", "/api/auth/me").permitAll()
                 it.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/logout").permitAll()
                 it.anyRequest().authenticated()
             }

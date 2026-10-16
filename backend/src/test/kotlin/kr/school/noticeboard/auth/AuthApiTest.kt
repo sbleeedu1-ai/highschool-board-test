@@ -97,6 +97,14 @@ class AuthApiTest {
         assertThat(res.body()).contains("\"code\":\"UNAUTHORIZED\"")
     }
 
+    @Test
+    fun `공개 목록에 없는 GET 요청도 로그인하지 않으면 401이다`() {
+        // 나중에 관리자 전용 조회 API가 생겨도 실수로 공개되지 않게, 읽기는 정해 둔 주소만 공개한다
+        val res = client.get("/api/admin-only-example")
+
+        assertThat(res.statusCode()).isEqualTo(401)
+    }
+
     companion object {
         const val LOGIN_OK = """{"username":"test-admin","password":"test-password-1234"}"""
     }

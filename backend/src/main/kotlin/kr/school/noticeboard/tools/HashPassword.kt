@@ -21,4 +21,7 @@ fun main() {
         return
     }
     println(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
+    if (console == null) {
+        System.err.println("입력한 비밀번호가 화면에 남아 있다면 해시를 복사한 뒤 화면을 지우세요(윈도우 cls, mac clear).")
+    }
 }
