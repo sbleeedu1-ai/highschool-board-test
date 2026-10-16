@@ -23,6 +23,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.flywaydb:flyway-database-postgresql")
@@ -33,6 +34,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -53,4 +55,20 @@ allOpen {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+// 관리자 비밀번호 해시를 만드는 로컬 전용 명령: ./gradlew hashPassword -q --console=plain
+tasks.register<JavaExec>("hashPassword") {
+	group = "application"
+	description = "관리자 비밀번호를 입력받아 해시만 출력한다(원문은 저장하지 않는다)"
+	classpath = sourceSets["main"].runtimeClasspath
+	mainClass = "kr.school.noticeboard.tools.HashPasswordKt"
+	standardInput = System.`in`
+	// 윈도우 터미널에서 한글 안내 문구가 깨지지 않게 한다
+	jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
+}
+
+// 실행 진입점이 둘(서버, hashPassword)이므로 서버 쪽을 명시한다
+springBoot {
+	mainClass = "kr.school.noticeboard.NoticeboardApplicationKt"
 }

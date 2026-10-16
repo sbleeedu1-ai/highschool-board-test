@@ -12,7 +12,19 @@ spring:
 
 server:
   port: ${PORT:8080}
+  servlet:
+    session:
+      # 30분 동안 아무 요청이 없으면 로그인이 풀린다
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: true
+        same-site: lax
 
 app:
   # Railway가 배포할 때 넣어 주는 커밋 번호. 없으면(로컬·테스트) local
   version: ${RAILWAY_GIT_COMMIT_SHA:local}
+  # 관리자 계정(ADR-0002). 값은 환경변수로만 넣고 저장소에는 적지 않는다
+  admin:
+    username: ${ADMIN_USERNAME}
+    password-hash: ${ADMIN_PASSWORD_HASH}

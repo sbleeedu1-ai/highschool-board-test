@@ -4,3 +4,9 @@ spring:
     url: jdbc:h2:mem:noticeboard;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
     username: sa
     password: ""
+
+# 테스트 전용 가짜 관리자 계정(비밀번호: test-password-1234). 운영 값과 관계없다
+app:
+  admin:
+    username: test-admin
+    password-hash: "{bcrypt}$2a$10$fMsc9RyhK098zvD699quo.P94EncDH.jRVUXJsUd1bkoBcMljEtWq"
