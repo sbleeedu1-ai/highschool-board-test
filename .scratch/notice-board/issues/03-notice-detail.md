@@ -8,11 +8,11 @@
 
 명세 사용자 이야기: 11-20
 
-- [ ] `GET /api/notices/{id}`: 공지 상세. 없으면 공통 형식의 404(`NOTICE_NOT_FOUND`)
-- [ ] 상세 화면 주소 `/notices/:id`. 주소로 바로 들어와도 열린다
-- [ ] 본문 줄바꿈 보존. `http://`·`https://` 주소만 새 탭 링크(`noopener`)로 바꾸고, HTML을 그대로 넣지 않는다
-- [ ] `작성 YYYY-MM-DD HH:mm`(한국 시간). 수정일시가 있으면 `· 수정 YYYY-MM-DD HH:mm`을 덧붙인다
-- [ ] 없는 공지: "공지를 찾을 수 없습니다"와 [목록으로]
-- [ ] 상세에서 목록으로 돌아가면 보던 페이지로 간다
-- [ ] HTTP API 테스트: 상세 조회, 404
-- [ ] Vitest: 링크 자동 변환 함수(http(s)만 변환, `<script>`·`javascript:` 무력화), 수정 표시 여부
+- [x] `GET /api/notices/{id}`: 공지 상세. 없으면 공통 형식의 404(`NOTICE_NOT_FOUND`)
+- [x] 상세 화면 주소 `/notices/:id`. 주소로 바로 들어와도 열린다
+- [x] 본문 줄바꿈 보존. `http://`·`https://` 주소만 새 탭 링크(`noopener`)로 바꾸고, HTML을 그대로 넣지 않는다
+- [x] `작성 YYYY-MM-DD HH:mm`(한국 시간). 수정일시가 있으면 `· 수정 YYYY-MM-DD HH:mm`을 덧붙인다
+- [x] 없는 공지: "공지를 찾을 수 없습니다"와 [목록으로]
+- [x] 상세에서 목록으로 돌아가면 보던 페이지로 간다
+- [x] HTTP API 테스트: 상세 조회, 404
+- [x] Vitest: 링크 자동 변환 함수(http(s)만 변환, `<script>`·`javascript:` 무력화), 수정 표시 여부
