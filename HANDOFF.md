@@ -3,17 +3,14 @@
 마지막 갱신: 2026-10-16 · Claude · 강의실 PC
 
 ## 다음 할 일
-명세 `.scratch/notice-board/spec.md`를 사용자가 검토하고, 승인되면 `/to-tickets`로 구현 티켓을 `.scratch/notice-board/issues/`에 쪼갠다.
+`/to-tickets`로 명세 `.scratch/notice-board/spec.md`를 구현 티켓으로 쪼개 `.scratch/notice-board/issues/`에 만든다.
 
 ## 현재 상태
-- 설계 합의 완료(grill-with-docs, Q1-Q29). 코드는 아직 없다.
-- 작업 브랜치: `docs/notice-board-design` (PR은 아직 만들지 않음, 사용자 확인 필요)
+- 설계 합의 완료(grill-with-docs, Q1-Q29), 명세 승인됨. 코드는 아직 없다.
+- 설계 문서는 PR로 `main`에 병합됨.
 
 ## 막힌 점 / 확인이 필요한 결정
-명세에 들어갔지만 세션에서 명시적으로 묻지 않은 항목(검토 때 확인):
-- 방문자 화면 경로: 목록 `/`, 상세 `/notices/:id`
-- 로그인 잠금 시 상태 코드 429(명세에 "구현 시 확정"으로 표시)
-- 로그아웃 버튼은 로그인 상태에서만 표시
+- 없음. (세션 뒤 추가 확인한 3가지 — 방문자 경로 `/`·`/notices/:id`, 잠금 시 429, 로그아웃 버튼은 로그인 상태에서만 — 사용자 동의 완료, 명세에 반영)
 
 ## 마지막 검증
 - `git grep GLOSSARY`: 남은 것은 `docs/agents/domain.md`의 "GLOSSARY.md 대신 CONTEXT.md" 안내 2곳뿐(의도된 것)
