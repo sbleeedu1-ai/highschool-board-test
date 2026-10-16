@@ -11,15 +11,20 @@
 - 티켓 03 구현 완료(이 브랜치). Sonnet이 작성, Opus가 검토·화면 확인.
   - 백엔드: `GET /api/notices/{id}`, 없는 공지(숫자가 아닌 id 포함)는 404 `NOTICE_NOT_FOUND`. `NoticeNotFoundException`은 06·07도 쓴다
   - 프론트: `/notices/:id` 상세 화면, `src/lib/linkify.ts`(http(s)만 링크, HTML로 넣지 않음), 상세 날짜 형식, 목록 페이지로 돌아가기
-- 티켓 08은 다른 폴더(`highschool_board_test`, 브랜치 `feat/08-proxy-secret-and-lockout`)에서 진행했다.
+- 티켓 08 구현 완료(`feat/08-proxy-secret-and-lockout`, 03 위에 쌓음). Opus가 작성.
+  - 백엔드: `ProxySecretFilter`(비밀값 없거나 틀리면 403 `PROXY_SECRET_INVALID`, 상태 확인만 예외, 비밀값이 맞을 때만 `X-Client-IP`를 믿음), `LoginLockout`(IP별 5회 연속 실패 → 10분 429 `LOGIN_LOCKED`)
+  - 설정: `app.proxy.check-enabled`는 기본 켜짐, `local`·`test`에서 끔. 비밀값은 환경변수 `PROXY_SECRET`(켜져 있는데 비어 있으면 서버가 뜨지 않는다)
+  - 프론트: `functions/api/[[path]].ts`(Pages Functions 진입점), 바꾸는 규칙은 `src/proxy/backendRequest.ts`의 순수 함수
 - 실행·테스트 명령, 로컬 관리자 계정 만드는 법은 `AGENTS.md`의 "프로젝트" 칸에 있다.
 
 ## 막힌 점 / 확인이 필요한 결정
 - 없음.
 
 ## 모르면 실수할 것
-- **티켓 08에서 볼 것**: 서버는 CSRF가 아닌 403에도 "다시 시도해 주세요"를 준다. 비밀 헤더 403과 문구·코드가 겹치지 않게 정한다. 로그인 잠금이 생기기 전까지는 로그인 시도 횟수 제한이 없다.
-- **티켓 09에서 볼 것**: XSRF-TOKEN 쿠키의 Secure는 요청이 HTTPS인지(`request.isSecure()`)를 따른다. Railway 프록시 뒤에서는 `server.forward-headers-strategy` 설정이 필요할 수 있다.
+- 비밀 헤더 403은 코드 `PROXY_SECRET_INVALID`·문구 "허용되지 않은 접근입니다"로 CSRF 403(`CSRF_INVALID`·"다시 시도해 주세요")과 구분했다.
+- 로그인 잠금 테스트는 실제 서버 + 바꿔 끼울 수 있는 시계(`support/MutableClock.kt`)로 돈다. 잠금 기록이 메모리에 남으므로 테스트마다 서버를 새로 띄운다(`@DirtiesContext`, 느린 편).
+- 로그인 잠금은 IP 한 개 단위다. IPv6는 한 사람이 주소를 많이 가질 수 있어 묶어서 세면 더 단단하지만 명세 밖이라 하지 않았다. Cloudflare가 `CF-Connecting-IP`를 안 붙이는 경우 모든 방문자가 프록시 주소 하나로 묶인다(보통은 붙는다).
+- **티켓 09에서 볼 것**: XSRF-TOKEN 쿠키의 Secure는 요청이 HTTPS인지(`request.isSecure()`)를 따른다. Railway 프록시 뒤에서는 `server.forward-headers-strategy` 설정이 필요할 수 있다. Pages 환경변수는 `BACKEND_URL`·`PROXY_SECRET`, Railway는 `PROXY_SECRET`·`ADMIN_USERNAME`·`ADMIN_PASSWORD_HASH`. Functions는 방문자의 `X-Forwarded-*`를 지우고 보낸다.
 - 로그아웃 API는 로그인하지 않아도 204를 준다(Spring의 로그아웃 필터가 권한 검사보다 먼저 돈다). 명세 표에는 "관리자"로 적혀 있지만 해가 없어 그대로 두었다.
 - 로그인 뒤 CSRF 토큰을 바꾸지 않는다. 이 앱은 토큰을 쿠키와 헤더로 맞춰 보는 방식이라, 쿠키를 심을 수 있는 공격자는 로그인 뒤에도 다시 심을 수 있어 바꿔도 이득이 거의 없다고 판단했다.
 - `./gradlew hashPassword`는 Gradle 안에서 돌아 입력한 비밀번호가 화면에 보인다(원문을 저장·출력하지는 않는다). 해시를 복사한 뒤 화면을 지우라는 안내를 출력한다.
@@ -34,6 +39,7 @@
 - Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다.
 
 ## 마지막 검증
+- 03+08 합친 상태: 백엔드 35개, 프론트 Vitest 38개·타입 검사(Functions 파일 포함)·빌드 통과. lint 경고 3개(오류 없음). 잠금 테스트는 두 번 연달아 돌려 흔들리지 않음을 확인
 - 티켓 03: 백엔드 23개, 프론트 Vitest 32개·타입 검사·빌드 통과. 브라우저로 줄바꿈·링크 2개(`noopener`)·`<script>`는 글자로만·한국 시간 날짜(`작성 2026-10-16 14:30 · 수정 2026-10-17 09:00`)·없는 공지 화면·390px 폭 확인
 - 04 브랜치(02 포함) 백엔드 `./gradlew clean test`: 19개 통과. 인증 테스트는 실제 서버를 띄워 쿠키 속성(HttpOnly·Secure·SameSite=Lax)까지 본다. `HttpOnly`를 끄면 테스트가 실패하는 것도 확인했다
 - 프론트: Vitest 19개(쿠키 읽기, 돌아갈 주소 검사 포함), 타입 검사, 빌드 통과. lint는 경고 3개(오류 없음)
