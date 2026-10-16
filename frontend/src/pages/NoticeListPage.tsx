@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/lib/auth'
 import { formatListDate } from '@/lib/date'
 import { fetchNotices, type NoticeList } from '@/lib/notices'
 import { parsePage } from '@/lib/page'
@@ -15,7 +16,24 @@ function pageNumbers(current: number, totalPages: number): number[] {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 }
 
+/** 공지 목록 화면. 로그인한 관리자에게만 [새 공지] 버튼이 보인다(공지가 하나도 없을 때도) */
 export default function NoticeListPage() {
+  const { me } = useAuth()
+  return (
+    <div className="flex flex-col gap-4">
+      {me?.authenticated && (
+        <div className="flex justify-end">
+          <Button asChild>
+            <Link to="/admin/notices/new">새 공지</Link>
+          </Button>
+        </div>
+      )}
+      <NoticeList />
+    </div>
+  )
+}
+
+function NoticeList() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = parsePage(searchParams.get('page'))
   const [result, setResult] = useState<Result | null>(null)

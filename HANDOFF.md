@@ -1,26 +1,25 @@
 # HANDOFF
 
-마지막 갱신: 2026-10-16 · Claude · 강의실 PC
+마지막 갱신: 2026-10-16 · Claude · 강의실 PC(사용량 90%로 마감)
 
 ## 다음 할 일
-1. 사용자 확인 후 03(`feat/03-notice-detail`)과 08(`feat/08-proxy-secret-and-lockout`, 03 위에 쌓음) PR을 만들고 03 → 08 순서로 병합한다.
-2. 그다음 05(공지 등록)를 진행한다. 05는 03·04에 의존하고, 06·07은 05에 의존한다. 09(배포)는 08 뒤에 사람이 할 일이 있다(`ready-for-human`).
+1. 06(공지 수정)과 07(공지 삭제)을 병렬로 진행한다(둘 다 05에만 의존). 사용자는 사용량이 비슷하면 병렬로 시간을 아끼는 쪽을 택했다. 지금까지는 할 일이 분명한 쪽을 Sonnet(별도 작업 폴더, git worktree)에, 보안·까다로운 쪽을 Opus에 맡겼다. 06은 `NoticeForm`·`NoticeInput`·`NoticeNotFoundException`을 그대로 쓴다.
+3. 09(배포)는 사람이 할 일이 있는 티켓이다(`ready-for-human`, `/wizard` 추천). 10(운영 E2E)은 09 뒤.
 
 ## 현재 상태
-- 티켓 01·02·04 병합 완료(PR #6·#7·#8).
-- 티켓 03 구현 완료(이 브랜치). Sonnet이 작성, Opus가 검토·화면 확인.
-  - 백엔드: `GET /api/notices/{id}`, 없는 공지(숫자가 아닌 id 포함)는 404 `NOTICE_NOT_FOUND`. `NoticeNotFoundException`은 06·07도 쓴다
-  - 프론트: `/notices/:id` 상세 화면, `src/lib/linkify.ts`(http(s)만 링크, HTML로 넣지 않음), 상세 날짜 형식, 목록 페이지로 돌아가기
-- 티켓 08 구현 완료(`feat/08-proxy-secret-and-lockout`, 03 위에 쌓음). Opus가 작성.
-  - 백엔드: `ProxySecretFilter`(비밀값 없거나 틀리면 403 `PROXY_SECRET_INVALID`, 상태 확인만 예외, 비밀값이 맞을 때만 `X-Client-IP`를 믿음), `LoginLockout`(IP별 5회 연속 실패 → 10분 429 `LOGIN_LOCKED`)
-  - 설정: `app.proxy.check-enabled`는 기본 켜짐, `local`·`test`에서 끔. 비밀값은 환경변수 `PROXY_SECRET`(켜져 있는데 비어 있으면 서버가 뜨지 않는다)
-  - 프론트: `functions/api/[[path]].ts`(Pages Functions 진입점), 바꾸는 규칙은 `src/proxy/backendRequest.ts`의 순수 함수
+- 티켓 01·02·03·04·05·08 병합 완료(PR #6-#11). 남은 티켓: 06·07(병렬 가능), 09(배포, 사람 작업 포함), 10(운영 E2E).
+- 티켓 05(Opus 단독):
+  - 백엔드: `POST /api/notices`(관리자만, 201 + Location). 입력 검사는 `notice/NoticeInput.kt`(앞뒤 공백 제거 후 제목 1-100자·본문 1-5,000자, 틀리면 400 `INVALID_INPUT` + `fieldErrors`). 작성일시는 시계 값을 마이크로초까지 자른 값
+  - 프론트: 목록의 [새 공지](로그인 시에만, 빈 목록에서도), `/admin/notices/new` 등록 화면, 공용 입력 칸 `components/NoticeForm.tsx`(글자 수, 칸별 안내, 서버 안내 표시), `src/lib/noticeInput.ts`
 - 실행·테스트 명령, 로컬 관리자 계정 만드는 법은 `AGENTS.md`의 "프로젝트" 칸에 있다.
 
 ## 막힌 점 / 확인이 필요한 결정
 - 없음.
 
 ## 모르면 실수할 것
+- 글자 수는 화면·서버 모두 UTF-16 기준이라 이모지는 2자로 센다. 테스트 DB(H2)가 이 기준으로 길이를 재기 때문에 맞췄다. 운영 PostgreSQL은 더 너그러우므로 넘칠 일은 없다.
+- 앞뒤 공백 기준은 화면(JavaScript `trim`)에 맞췄다. 서버는 `NoticeInput.isTrimmable`을 쓴다(Kotlin 기본 `trim`과 다르다).
+- 테스트용 시계(`support/MutableClock.kt`)는 같은 설정의 테스트끼리 함께 쓴다. 시계를 돌리는 테스트는 `@BeforeEach`에서 `reset()`한다.
 - 비밀 헤더 403은 코드 `PROXY_SECRET_INVALID`·문구 "허용되지 않은 접근입니다"로 CSRF 403(`CSRF_INVALID`·"다시 시도해 주세요")과 구분했다.
 - 로그인 잠금 테스트는 실제 서버 + 바꿔 끼울 수 있는 시계(`support/MutableClock.kt`)로 돈다. 잠금 기록이 메모리에 남으므로 테스트마다 서버를 새로 띄운다(`@DirtiesContext`, 느린 편).
 - 로그인 잠금은 IP 한 개 단위다. IPv6는 한 사람이 주소를 많이 가질 수 있어 묶어서 세면 더 단단하지만 명세 밖이라 하지 않았다. Cloudflare가 `CF-Connecting-IP`를 안 붙이는 경우 모든 방문자가 프록시 주소 하나로 묶인다(보통은 붙는다).
@@ -39,6 +38,8 @@
 - Matt Pocock 스킬 업데이트는 `npx skills update`가 아니라 `new-setup`의 `install.cmd`로 한다.
 
 ## 마지막 검증
+- 티켓 05: 백엔드 44개, 프론트 Vitest 43개·타입 검사·빌드 통과. 경계값(100/101자)을 일부러 101로 바꾸면 테스트가 실패하는 것 확인
+- 티켓 05 브라우저(메모리 DB): 로그인 시 [새 공지], 빈 칸 등록 시 두 칸 안내, 글자 수 `19/100`(앞뒤 공백 제외), 등록 후 새 상세로 이동, 작성 중 로그아웃 → 만료 안내가 있는 로그인 화면, CSRF 쿠키를 지우고 등록 → "다시 시도해 주세요"
 - 03+08 합친 상태: 백엔드 35개, 프론트 Vitest 38개·타입 검사(Functions 파일 포함)·빌드 통과. lint 경고 3개(오류 없음). 잠금 테스트는 두 번 연달아 돌려 흔들리지 않음을 확인
 - 티켓 03: 백엔드 23개, 프론트 Vitest 32개·타입 검사·빌드 통과. 브라우저로 줄바꿈·링크 2개(`noopener`)·`<script>`는 글자로만·한국 시간 날짜(`작성 2026-10-16 14:30 · 수정 2026-10-17 09:00`)·없는 공지 화면·390px 폭 확인
 - 04 브랜치(02 포함) 백엔드 `./gradlew clean test`: 19개 통과. 인증 테스트는 실제 서버를 띄워 쿠키 속성(HttpOnly·Secure·SameSite=Lax)까지 본다. `HttpOnly`를 끄면 테스트가 실패하는 것도 확인했다
